@@ -17,9 +17,9 @@
 
 
 bl_info = {
-    "name": "2 B",
+    "name": "2 Battiti",
     "author": "Betti",
-    "version": (0, 0, 0),
+    "version": (0, 1, 0),
     "blender": (3, 0, 0),
     "location": "View3D > 2B",
     "description": """Addons for the 2B production""",
@@ -33,10 +33,15 @@ import bpy
 from importlib import reload
 
 from . import twoB_ui
+from . import update_comp_node_tree
+from . import ExtraSettingComp
 
 reload(twoB_ui)
+reload(update_comp_node_tree)
+reload(ExtraSettingComp)
 
 from .twoB_ui import *
+from .update_comp_node_tree import *
 
 
 
