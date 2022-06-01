@@ -44,6 +44,24 @@ class TwoBUpdateComp(bpy.types.Operator):
         self.report({'INFO'}, f"Following scenes node trees updated: {updated_scenes}")
         return{'FINISHED'}
 
+class TwoBRenamePaths(bpy.types.Operator):
+    """Rinomina tutti i percorsi del file che contengono il nome del file base, con il nome del file corrente"""
+    bl_idname = "twob.rename_paths_filename"
+    bl_label = "Rename Paths with file name"
+    bl_options = {'REGISTER', 'UNDO'}
+
+   # file_zero_name: bpy.props.StringProperty(
+    #    name="file_zero"
+    #)
+
+    #@classmethod
+    #def poll(cls, context):
+     #   return cls.file_zero_name != ""
+
+    def execute(self, context):
+        rename_all_paths_with_filename()
+        return{'FINISHED'}
+
 class TwoBCompositingPanel(bpy.types.Panel):
     """Panel for useful operations in the 2B production"""
     bl_label = "Compositing"
@@ -56,7 +74,8 @@ class TwoBCompositingPanel(bpy.types.Panel):
         layout.row().prop(context.window_manager, "twob_file_zero")
         layout.row().operator( "twob.update_compositor_nodes")
         layout.row().label(text="Update the Scenes and Layers names first, otherwise this may fail.", icon='INFO')
-
+        layout.row().separator
+        layout.row().operator( "twob.rename_paths_filename")
     
 
 class TwoBRenderPanel(bpy.types.Panel):
@@ -78,8 +97,9 @@ class TwoBRenderPanel(bpy.types.Panel):
 def twoB_ui_register():
     bpy.types.WindowManager.twob_file_zero = bpy.props.StringProperty(subtype='FILE_PATH',
                         name="File zero",
-                        default=f"//3D_ANMs{sep}3D_ANM_SCE000{sep}3D_ANM_SCE000_CUT000")
+                        default=f"//..{sep}3D_ANM_SCE000{sep}3D_ANM_SCE000_CUT000.blend")
     bpy.utils.register_class(TwoBUpdateComp)
+    bpy.utils.register_class(TwoBRenamePaths)
     bpy.utils.register_class(TwoBCompositingPanel)
     bpy.utils.register_class(TwoBRenderPanel)
     bpy.utils.register_class(NewMistPanel)
@@ -87,6 +107,7 @@ def twoB_ui_register():
 
 def twoB_ui_unregister():
     bpy.utils.unregister_class(TwoBUpdateComp)
+    bpy.utils.unregister_class(TwoBRenamePaths)
     bpy.utils.unregister_class(TwoBCompositingPanel)
     bpy.utils.unregister_class(NewMistPanel)
     bpy.utils.unregister_class(TwoBRenderPanel)

@@ -1,5 +1,6 @@
 import bpy
 from .ExtraSettingComp import *
+from os import sep
 
 
 
@@ -40,10 +41,32 @@ def  overwrite_tree(scene_to_be_overwritten:bpy.types.Scene, scene_to_copy_from:
             })
         
     for link in links_dict_list:
-        print(link)
         from_socket = scene_to_be_overwritten.node_tree.nodes[link['output_node']].outputs[link['output_socket']]
         to_socket = scene_to_be_overwritten.node_tree.nodes[link['input_node']].inputs[link['input_socket']]
         new_link = scene_to_be_overwritten.node_tree.links.new(to_socket, from_socket)
+
+def find_parts_to_replace_in_file_path(old_file_path):
+    path_splits = old_file_path.split(sep)
+    if len(path_splits) < 2:
+        print("2B: Separator error while replacing paths. Please use the file zero's native OS or convert its paths.")
+        return "wrong os"
+    for split in path_splits:
+        if "SCE000" in split: return split
+    return "no_replacement"
+
+def rename_all_paths_with_filename():
+    """filewise"""
+    name_to_replace = bpy.path.basename(bpy.data.filepath).replace("3D_", "").replace(".blend", "")
+    for scene in bpy.data.scenes:
+        for node in scene.node_tree.nodes:
+            existing_base_path = getattr(node, "base_path", None)
+            if not existing_base_path: continue
+            to_be_replaced = find_parts_to_replace_in_file_path(existing_base_path)
+            if to_be_replaced == "no_replacement": continue
+            node.base_path = existing_base_path.replace(to_be_replaced, name_to_replace)
+        to_be_replaced_render = find_parts_to_replace_in_file_path(scene.render.filepath)
+        if to_be_replaced_render == "no_replacement": continue
+        scene.render.filepath = scene.render.filepath.replace(to_be_replaced_render, name_to_replace)
 
 
 
@@ -64,12 +87,13 @@ def update_comp_node_tree_func(file_zero_path):
             local_scenes.append(scene)
 
     for local_scene in local_scenes:
-        for linked_scene in linked_scenes:
+        for linked_scene in reversed(linked_scenes):
             if local_scene.name == linked_scene.name: 
                 local_scene.use_nodes = True
                 overwrite_tree(local_scene, linked_scene)
                 bpy.data.scenes.remove(linked_scene, do_unlink=True)
+                linked_scenes.remove(linked_scene)
                 break
-    
+    rename_all_paths_with_filename()
     return str(initial_linked_scenes)
             

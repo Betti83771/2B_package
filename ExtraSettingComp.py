@@ -65,9 +65,9 @@ def writeExtraSettings(dict, node, type, nimi, main_mode):
         settings.append([3, 'filepath', filepath])
 
     elif node.type == 'R_LAYERS':
-
+        
+        settings.append([0, 'scene', bpy.data.scenes[node.scene.name]])
         settings.append([0, 'layer', node.layer])
-        settings.append([0, 'scene', node.scene])
 
     elif node.type == 'RGB':
 
@@ -93,11 +93,7 @@ def writeExtraSettings(dict, node, type, nimi, main_mode):
 
         settings.append([2, 'Value', node.outputs['Value'].default_value])
 
-
-
     # OUTPUT
-
-
 
     elif node.type == 'COMPOSITE':
 
@@ -154,10 +150,7 @@ def writeExtraSettings(dict, node, type, nimi, main_mode):
                           node.inputs[0].default_value[2],
                           node.inputs[0].default_value[3]]])
 
-
     # COLOR
-
-
 
     elif node.type == 'ALPHAOVER':
 
@@ -543,8 +536,6 @@ def writeExtraSettings(dict, node, type, nimi, main_mode):
                           node.inputs['right'].default_value[1],
                           node.inputs['right'].default_value[2],
                           node.inputs['right'].default_value[3]]])
-
-
 
     # FILTER
 
@@ -1333,6 +1324,10 @@ def readExtraSettings(extra_settings, node):
             node.inputs[setting[1]].default_value = setting[2]
             node.node_tree.inputs[setting[1]].min_value = setting[3]
             node.node_tree.inputs[setting[1]].max_value = setting[4]
+
+        # layer node
+        elif setting[0] == 12:
+            node.layer = node.scene.view_layers[setting[2]]
 
 
 
