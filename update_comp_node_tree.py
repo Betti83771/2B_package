@@ -76,9 +76,12 @@ def update_comp_node_tree_func(file_zero_path):
     linked_scenes = []
     local_scenes = []
     initial_linked_scenes = []
-    with bpy.data.libraries.load(file_zero_path, link=True) as (data_from, data_to):
-        data_to.scenes = [scene for scene in data_from.scenes if scene in bpy.data.scenes.keys()]
-        for scene in data_to.scenes: initial_linked_scenes.append(scene)
+    try:
+        with bpy.data.libraries.load(file_zero_path, link=True) as (data_from, data_to):
+            data_to.scenes = [scene for scene in data_from.scenes if scene in bpy.data.scenes.keys()]
+            for scene in data_to.scenes: initial_linked_scenes.append(scene)
+    except OSError:
+        return "file_not_found"
 
     for scene in bpy.data.scenes:
         if scene.library != None: 

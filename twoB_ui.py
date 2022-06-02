@@ -2,7 +2,9 @@
 import bpy
 from os import sep
 from .update_comp_node_tree import *
-from bl_ui.properties_world import EEVEE_WORLD_PT_mist
+from .timeline_operators import *
+from .make_anm_files_from_lay import *
+from .misc_operators import *
 
 class NewMistPanel(bpy.types.Panel):
     bl_label = "Mist"
@@ -41,8 +43,11 @@ class TwoBUpdateComp(bpy.types.Operator):
 
     def execute(self, context):
         updated_scenes = update_comp_node_tree_func(context.window_manager.twob_file_zero)
+        if updated_scenes == "file_not_found": 
+            self.report({'ERROR'}, f"File not found: {context.window_manager.twob_file_zero}")
+            return {'FINISHED'}
         self.report({'INFO'}, f"Following scenes node trees updated: {updated_scenes}")
-        return{'FINISHED'}
+        return {'FINISHED'}
 
 class TwoBRenamePaths(bpy.types.Operator):
     """Rinomina tutti i percorsi del file che contengono il nome del file base, con il nome del file corrente"""
@@ -76,6 +81,33 @@ class TwoBCompositingPanel(bpy.types.Panel):
         layout.row().label(text="Update the Scenes and Layers names first, otherwise this may fail.", icon='INFO')
         layout.row().separator
         layout.row().operator( "twob.rename_paths_filename")
+        layout.row().separator
+
+
+class TwoBTimelinePanel(bpy.types.Panel):
+    """Panel for useful operations in the 2B production"""
+    bl_label = "Timeline Operations"
+    bl_idname = "TWOB_PT_timelinepanel"
+    bl_space_type = 'VIEW_3D'
+    bl_category = "2B"
+    bl_region_type = 'UI'
+
+    def draw(self, context):
+        layout = self.layout
+        layout.row().operator( "twob.timeline_reset")
+        layout.row().operator( "twob.timeline_uniform")
+
+class TwoBMiscPanel(bpy.types.Panel):
+    """Panel for useful operations in the 2B production"""
+    bl_label = "Other"
+    bl_idname = "TWOB_PT_miscpanel"
+    bl_space_type = 'VIEW_3D'
+    bl_category = "2B"
+    bl_region_type = 'UI'
+
+    def draw(self, context):
+        layout = self.layout
+        layout.row().operator( "twob.make_rig_animatable")
     
 
 class TwoBRenderPanel(bpy.types.Panel):
@@ -90,26 +122,42 @@ class TwoBRenderPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
 
-        row = layout.row()
-        row.prop(context.scene.world.node_tree.nodes["Background"].inputs[1], "default_value", text="World strength")
-        
      
 def twoB_ui_register():
     bpy.types.WindowManager.twob_file_zero = bpy.props.StringProperty(subtype='FILE_PATH',
                         name="File zero",
                         default=f"//..{sep}3D_ANM_SCE000{sep}3D_ANM_SCE000_CUT000.blend")
+    bpy.types.WindowManager.twob_anm_destination_folder = bpy.props.StringProperty(subtype='DIR_PATH',
+                        name="Destination folder",
+                        default=f"")
+    bpy.utils.register_class(TwoBTimelineUniform)
+    bpy.utils.register_class(TwoBTimelineReset)
     bpy.utils.register_class(TwoBUpdateComp)
+    bpy.utils.register_class(TwoBMakeRigAnimatable)
+    bpy.utils.register_class(TwoBAnmFromLayout)
     bpy.utils.register_class(TwoBRenamePaths)
     bpy.utils.register_class(TwoBCompositingPanel)
+    bpy.utils.register_class(TwoBTimelinePanel)
+    bpy.utils.register_class(TwoBMiscPanel)
     bpy.utils.register_class(TwoBRenderPanel)
+    bpy.utils.register_class(TwoBMakeAnmFilesSubpanel)
     bpy.utils.register_class(NewMistPanel)
 
 
 def twoB_ui_unregister():
+    bpy.utils.unregister_class(TwoBTimelineUniform)
+    bpy.utils.unregister_class(TwoBTimelineReset)
     bpy.utils.unregister_class(TwoBUpdateComp)
+    bpy.utils.unregister_class(TwoBAnmFromLayout)
     bpy.utils.unregister_class(TwoBRenamePaths)
+    bpy.utils.unregister_class(TwoBMakeRigAnimatable)
     bpy.utils.unregister_class(TwoBCompositingPanel)
+    bpy.utils.unregister_class(TwoBTimelinePanel)
+    bpy.utils.unregister_class(TwoBMiscPanel)
     bpy.utils.unregister_class(NewMistPanel)
+    bpy.utils.unregister_class(TwoBMakeAnmFilesSubpanel)
     bpy.utils.unregister_class(TwoBRenderPanel)
+    del bpy.types.WindowManager.twob_file_zero
+    del bpy.types.WindowManager.twob_anm_destination_folder
     
     
