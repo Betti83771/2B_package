@@ -19,7 +19,7 @@
 bl_info = {
     "name": "2 Battiti",
     "author": "Betti",
-    "version": (0, 3, 0),
+    "version": (1, 1, 0),
     "blender": (3, 0, 0),
     "location": "View3D > 2B",
     "description": """Addons for the 2B production""",

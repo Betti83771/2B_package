@@ -11,9 +11,15 @@ def  overwrite_tree(scene_to_be_overwritten:bpy.types.Scene, scene_to_copy_from:
     for node_to_copy in scene_to_copy_from.node_tree.nodes:
         new_node = scene_to_be_overwritten.node_tree.nodes.new(node_to_copy.bl_idname)
         if new_node.bl_idname == 'CompositorNodeOutputFile':
+            new_node.format.file_format = node_to_copy.format.file_format
+            new_node.format.color_mode = node_to_copy.format.color_mode
+            new_node.format.color_depth = node_to_copy.format.color_depth
+            new_node.format.compression = node_to_copy.format.compression
+            new_node.format.quality = node_to_copy.format.quality
             new_node.file_slots.clear()
             for file_slot in node_to_copy.file_slots:
-                new_node.file_slots.new(file_slot.path)
+                new_slot = new_node.file_slots.new(file_slot.path)
+
         for i, input in enumerate(node_to_copy.inputs):
             if input.is_linked: continue
             new_node.inputs[i].default_value = input.default_value
