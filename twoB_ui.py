@@ -1,10 +1,12 @@
 
+from posixpath import split
 import bpy
 from os import sep
 from .update_comp_node_tree import *
 from .timeline_operators import *
 from .make_anm_files_from_lay import *
 from .misc_operators import *
+from .enable_render_nodes import *
 
 class NewMistPanel(bpy.types.Panel):
     bl_label = "Mist"
@@ -99,7 +101,7 @@ class TwoBTimelinePanel(bpy.types.Panel):
 
 class TwoBRelocatePathPanel(bpy.types.Panel):
     """Panel for useful operations in the 2B production"""
-    bl_label = "Other"
+    bl_label = "Relocate library paths"
     bl_idname = "TWOB_PT_relocpanel"
     bl_space_type = 'VIEW_3D'
     bl_category = "2B"
@@ -144,6 +146,7 @@ classes = [
     TwoBTimelineUniform,
     TwoBTimelineReset,
     TwoBUpdateComp,
+    TwoBEnableRenderNodesGenerateProps,
     TwoBMakeRigAnimatable,
     TwoBRelocatePaths,
     TwoBAnmFromLayout,
@@ -154,6 +157,7 @@ classes = [
     TwoBRelocatePathPanel,
     TwoBRenderPanel,
     TwoBMakeAnmFilesSubpanel,
+    TwoBEnableRenderNodesPanel,
     NewMistPanel
 
 ]
@@ -174,6 +178,7 @@ def twoB_ui_register():
                         default=f"//")
     bpy.types.WindowManager.twob_anm_cut_number_of_pre_and_post_frames = bpy.props.IntProperty(
         default=3, name="Pre/post roll frames", min =0)
+    bpy.types.Scene.twob_not_yet_generated_props = bpy.props.BoolProperty(default=True)
     for cls in classes:
         bpy.utils.register_class(cls)
 
@@ -186,5 +191,6 @@ def twoB_ui_unregister():
     del bpy.types.WindowManager.twob_relocate_paths_old_path
     del bpy.types.WindowManager.twob_relocate_paths_new_path
     del bpy.types.WindowManager.twob_anm_cut_number_of_pre_and_post_frames
+    del  bpy.types.WindowManager.twob_not_yet_generated_props
     
     

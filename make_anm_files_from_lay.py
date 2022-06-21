@@ -1,5 +1,6 @@
 import bpy
 from os import sep
+from .misc_operators import rename_all_paths_with_filename
 
 def saveas_cut_file(base_filename:str, destination_path:str, cut_name:str):
     """destination_path: 3D_ANM_SCE000 folder, in which to create the anm cut blends
@@ -46,11 +47,12 @@ def get_cut_names_and_duration(scene:bpy.types.Scene, roll_frames:int):
 def make_anm_files_func(scene_name, destination_path, roll_frames):
     scene = bpy.data.scenes[scene_name]
     lay_filepath = bpy.data.filepath
-    base_filename = bpy.path.basename(bpy.data.filepath).replace("LAY", "ANM").replace(".blend", "")
+    base_filename = bpy.path.basename(lay_filepath).replace("LAY", "ANM").replace(".blend", "")
     original_frame_start = scene.frame_start
     original_frame_end = scene.frame_end
     #original_markers = make_markers_dict(scene)
     cut_dict = get_cut_names_and_duration(scene, roll_frames)
+    prev_file_name = bpy.path.basename(lay_filepath)
     for key, value in cut_dict.items():
         clear_markers(scene)
         scene.frame_start = value[0]
@@ -62,13 +64,14 @@ def make_anm_files_func(scene_name, destination_path, roll_frames):
             scene.timeline_markers.new("POST", frame=value[1]) 
         else:
             scene.timeline_markers.new("END", frame=original_frame_end)
+        rename_all_paths_with_filename(old_file_name=prev_file_name)
         saveas_cut_file(base_filename, bpy.path.abspath(destination_path), key)
+        prev_file_name = bpy.path.basename(bpy.data.filepath)
     bpy.ops.wm.open_mainfile(filepath=lay_filepath )
     scene = bpy.data.scenes[scene_name]
     scene.frame_start =   original_frame_start
     scene.frame_end = original_frame_end
         
-
 
 class TwoBAnmFromLayout(bpy.types.Operator):
     """Crea un file ANM per ogni cut da questo file di LAUYOUT"""
@@ -97,6 +100,8 @@ class TwoBMakeAnmFilesSubpanel(bpy.types.Panel):
         layout.row().prop(context.window_manager, "twob_anm_destination_folder")
         layout.row().prop(context.window_manager, "twob_anm_cut_number_of_pre_and_post_frames")
         layout.row().label(text="Reset the timelines first!", icon="INFO")
+        layout.row().label(text="Also, save this file first.", icon="GHOST_ENABLED")
+        layout.row().label(text="Any unsaved changes will be lost.")
         op = layout.row().operator( "twob.make_anm_files_from_lay")
         op.folder_path = context.window_manager.twob_anm_destination_folder
         op.pre_and_post_frames = context.window_manager.twob_anm_cut_number_of_pre_and_post_frames

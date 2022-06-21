@@ -1,4 +1,32 @@
 import bpy
+from os import sep
+
+
+def find_parts_to_replace_in_file_path(old_file_path, old_file_name):
+    path_splits = old_file_path.split(sep)
+    if len(path_splits) < 2:
+        print("2B: Separator error while replacing paths. Please use the file zero's native OS or convert its paths.")
+        return "wrong os"
+    for split in path_splits:
+        if old_file_name in split: return split
+    return "no_replacement"
+
+def rename_all_paths_with_filename(old_file_name="SCE000"):
+    """filewise"""
+    name_to_replace = bpy.path.basename(bpy.data.filepath).replace("3D_", "").replace(".blend", "")
+    for scene in bpy.data.scenes:
+        for node in scene.node_tree.nodes:
+            existing_base_path = getattr(node, "base_path", None)
+            if not existing_base_path: continue
+            to_be_replaced = find_parts_to_replace_in_file_path(existing_base_path, old_file_name)
+            if to_be_replaced == "no_replacement": continue
+            node.base_path = existing_base_path.replace(to_be_replaced, name_to_replace)
+        to_be_replaced_render = find_parts_to_replace_in_file_path(scene.render.filepath, old_file_name)
+        if to_be_replaced_render == "no_replacement": continue
+        scene.render.filepath = scene.render.filepath.replace(to_be_replaced_render, name_to_replace)
+
+
+
 
 def relocate_library_paths(old_path, new_path):
     old_path = old_path.replace("//", "")
@@ -48,7 +76,7 @@ class TwoBMakeRigAnimatable(bpy.types.Operator):
 class TwoBRelocatePaths(bpy.types.Operator):
     """Replaces the old path with the new one in every library."""
     bl_idname = "twob.relocate_paths"
-    bl_label = "Relocate paths"
+    bl_label = "Relocate library paths"
     bl_options = {'UNDO'}
 
     old_path: bpy.props.StringProperty(subtype='FILE_PATH')
