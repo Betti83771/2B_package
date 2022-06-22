@@ -55,6 +55,9 @@ def make_linked_rig_animatable(rig:bpy.types.Object, scene:bpy.types.Scene, view
     turn_off_widgets_collections(view_layer.layer_collection)
     rig = recursively_find_rig(override_hierarchy)
     rig.show_in_front = True
+    for text in bpy.data.texts:
+        if rig.data["rig_id"] in text.as_string(): text.as_module()
+
     return
 
 class TwoBMakeRigAnimatable(bpy.types.Operator):
