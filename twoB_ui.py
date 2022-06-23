@@ -147,6 +147,7 @@ classes = [
     TwoBTimelineReset,
     TwoBUpdateComp,
     TwoBEnableRenderNodesGenerateProps,
+    TwoBEnableRenderNodesReset,
     TwoBMakeRigAnimatable,
     TwoBRelocatePaths,
     TwoBAnmFromLayout,

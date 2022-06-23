@@ -32,15 +32,18 @@ def erngp_prop_update_{layer_name}(self, context):
     empty_list = []
     given_node_companions = followLinks(layer_node, empty_list)
     for node_comp in given_node_companions:
-        if self.twob_boolprop_{layer_name}:
+        if self.twob_renderboolprop_{layer_name}:
             context.scene.node_tree.nodes[node_comp].mute = False
         else:
             context.scene.node_tree.nodes[node_comp].mute = True
-bpy.types.Scene.twob_boolprop_{layer_name} = bpy.props.BoolProperty(name="twob_boolprop_{layer_name}", default=True, update=erngp_prop_update_{layer_name})""")
+bpy.types.Scene.twob_renderboolprop_{layer_name} = bpy.props.BoolProperty(name="twob_renderboolprop_{layer_name}", default=True, update=erngp_prop_update_{layer_name})""")
     
+def  erngp_delete_boolprops(context):
+    for name, prop in context.window_manager.items():
+        if name.startswith("twob_renderboolprop_"): del prop
 
 class TwoBEnableRenderNodesGenerateProps(bpy.types.Operator):
-    """Click here to start."""
+    """Click here to start"""
     bl_idname = "twob.generate_render_nodes_boolprops"
     bl_label = "Initialize switches"
     bl_options = {'UNDO'}
@@ -49,6 +52,18 @@ class TwoBEnableRenderNodesGenerateProps(bpy.types.Operator):
     def execute(self, context):
         erngp_generate_boolprops(context)
         context.scene.twob_not_yet_generated_props = False
+        return  {'FINISHED'}
+
+class TwoBEnableRenderNodesReset(bpy.types.Operator):
+    """Delete all properties for a fresh start in this scene, something changes or the props break for whatever reason"""
+    bl_idname = "twob.delete_render_nodes_boolprops"
+    bl_label = "Reset"
+    bl_options = {'UNDO'}
+
+
+    def execute(self, context):
+        erngp_delete_boolprops(context)
+        context.scene.twob_not_yet_generated_props = True
         return  {'FINISHED'}
 
 class TwoBEnableRenderNodesPanel(bpy.types.Panel):
@@ -69,11 +84,13 @@ class TwoBEnableRenderNodesPanel(bpy.types.Panel):
             col.row().label(text="BKG")
             for layer in context.scene.view_layers:
                 if "BKG" not in layer.name: continue
-                col.row().prop(context.scene, "twob_boolprop_" + layer.name, text=layer.name)
+                col.row().prop(context.scene, "twob_renderboolprop_" + layer.name, text=layer.name)
             col = layout.column(align=True)
             col.row().label(text="CHR")
             for layer in context.scene.view_layers:
                 if "CHR" not in layer.name: continue
-                col.row().prop(context.scene, "twob_boolprop_" + layer.name, text=layer.name)
+                col.row().prop(context.scene, "twob_renderboolprop_" + layer.name, text=layer.name)
+            col = layout.column(align=True)
+            col.row().operator("twob.delete_render_nodes_boolprops")
 
         
