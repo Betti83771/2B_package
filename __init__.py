@@ -19,7 +19,7 @@
 bl_info = {
     "name": "2 Battiti",
     "author": "Betti",
-    "version": (1, 2, 2),
+    "version": (1, 2, 3),
     "blender": (3, 0, 0),
     "location": "View3D > 2B",
     "description": """Addons for the 2B production""",
@@ -39,6 +39,7 @@ from . import ExtraSettingComp
 from . import make_anm_files_from_lay
 from . import enable_render_nodes
 from . import misc_operators
+from . import bind_unbind
 
 reload(timeline_operators)
 reload(twoB_ui)
@@ -47,6 +48,7 @@ reload(ExtraSettingComp)
 reload(make_anm_files_from_lay)
 reload(enable_render_nodes)
 reload(misc_operators)
+reload(bind_unbind)
 
 from .twoB_ui import *
 from .update_comp_node_tree import *

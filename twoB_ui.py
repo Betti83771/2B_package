@@ -7,6 +7,7 @@ from .timeline_operators import *
 from .make_anm_files_from_lay import *
 from .misc_operators import *
 from .enable_render_nodes import *
+from .bind_unbind import * 
 
 class NewMistPanel(bpy.types.Panel):
     bl_label = "Mist"
@@ -126,6 +127,7 @@ class TwoBMiscPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         layout.row().operator( "twob.make_rig_animatable")
+        layout.row().operator( "object.bind_all")
         
 
     
@@ -143,6 +145,7 @@ class TwoBRenderPanel(bpy.types.Panel):
         layout = self.layout
 
 classes = [
+    BindAll,
     TwoBTimelineUniform,
     TwoBTimelineReset,
     TwoBUpdateComp,
