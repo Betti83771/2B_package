@@ -50,6 +50,7 @@ def recursively_find_rig(collection:bpy.types.Collection):
     return rig
 
 def make_linked_rig_animatable(rig:bpy.types.Object, scene:bpy.types.Scene, view_layer: bpy.types.ViewLayer):
+    matrix = rig.matrix_world
     override_hierarchy = rig.instance_collection.override_hierarchy_create(scene, view_layer)
     bpy.data.objects.remove(rig)
     turn_off_widgets_collections(view_layer.layer_collection)
@@ -57,7 +58,7 @@ def make_linked_rig_animatable(rig:bpy.types.Object, scene:bpy.types.Scene, view
     rig.show_in_front = True
     for text in bpy.data.texts:
         if rig.data["rig_id"] in text.as_string(): text.as_module()
-
+    rig.matrix_world = matrix
     return
 
 class TwoBMakeRigAnimatable(bpy.types.Operator):
