@@ -8,6 +8,7 @@ from .make_anm_files_from_lay import *
 from .misc_operators import *
 from .enable_render_nodes import *
 from .bind_unbind import * 
+from .operators_refresh_drivers import *
 
 class NewMistPanel(bpy.types.Panel):
     bl_label = "Mist"
@@ -128,6 +129,8 @@ class TwoBMiscPanel(bpy.types.Panel):
         layout = self.layout
         layout.row().operator( "twob.make_rig_animatable")
         layout.row().operator( "object.bind_all")
+        layout.row().operator( "object.remobe_broken_drivers")
+        layout.row().operator( "object.refresh_drivers")
         
 
     
@@ -146,6 +149,8 @@ class TwoBRenderPanel(bpy.types.Panel):
 
 classes = [
     BindAll,
+    RemoveBrokenDrivers,
+    RefreshDrivers,
     TwoBTimelineUniform,
     TwoBTimelineReset,
     TwoBUpdateComp,
