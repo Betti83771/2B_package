@@ -18,7 +18,7 @@
 
 
 # REPLACE "2B" WITH PRODUCTION INITIALS
-# REPLACE "2 Battiti" WITH PRODUCTION NAME
+# REPLACE "twob" WITH PRODUCTION NAME
 
 """Blender UI integrations for the addon updater.
 
@@ -76,7 +76,7 @@ except Exception as e:
 # not match and have errors. Must be all lowercase and no spaces! Should also
 # be unique among any other addons that could exist (using this updater code),
 # to avoid clashes in operator registration.
-updater.addon = "2 Battiti"
+updater.addon = "twob"
 
 
 # -----------------------------------------------------------------------------

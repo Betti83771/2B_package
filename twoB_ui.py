@@ -9,6 +9,7 @@ from .misc_operators import *
 from .enable_render_nodes import *
 from .bind_unbind import * 
 from .operators_refresh_drivers import *
+from .make_animatable_operations import * 
 
 class NewMistPanel(bpy.types.Panel):
     bl_label = "Mist"
@@ -117,6 +118,20 @@ class TwoBRelocatePathPanel(bpy.types.Panel):
         op.old_path = context.window_manager.twob_relocate_paths_old_path
         op.new_path = context.window_manager.twob_relocate_paths_new_path
 
+class TwoBMakeAnimatablePanel(bpy.types.Panel):
+    """Panel for useful operations in the 2B production"""
+    bl_label = "Rendianimabilitamenti"
+    bl_idname = "TWOB_PT_makeanimpanel"
+    bl_space_type = 'VIEW_3D'
+    bl_category = "2B"
+    bl_region_type = 'UI'
+
+    def draw(self, context):
+        layout = self.layout
+        layout.row().operator( "twob.make_rig_animatable")
+        layout.row().operator( "twob.make_scene_linked_obj_positionable")
+        layout.row().operator( "twob.make_animatable_replace_obj_prop")
+
 class TwoBMiscPanel(bpy.types.Panel):
     """Panel for useful operations in the 2B production"""
     bl_label = "Other"
@@ -127,14 +142,10 @@ class TwoBMiscPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        layout.row().operator( "twob.make_rig_animatable")
         layout.row().operator( "object.bind_all")
         layout.row().operator( "object.remobe_broken_drivers")
         layout.row().operator( "object.refresh_drivers")
         
-
-    
-
 class TwoBRenderPanel(bpy.types.Panel):
     """Panel for useful operations in the 2B production"""
     bl_label = "Render"
@@ -157,11 +168,14 @@ classes = [
     TwoBEnableRenderNodesGenerateProps,
     TwoBEnableRenderNodesReset,
     TwoBMakeRigAnimatable,
+    TwoBMakeSceneLinkedObjPositionable,
+    TwoBMakeAnimatableReplaceObjProp,
     TwoBRelocatePaths,
     TwoBAnmFromLayout,
     TwoBRenamePaths,
     TwoBCompositingPanel,
     TwoBTimelinePanel,
+    TwoBMakeAnimatablePanel,
     TwoBMiscPanel,
     TwoBRelocatePathPanel,
     TwoBRenderPanel,
