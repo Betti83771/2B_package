@@ -17,7 +17,8 @@
 # ##### END GPL LICENSE BLOCK #####
 
 
-# REPLACE "SAMPLE_ADDON"
+# REPLACE "2B" WITH PRODUCTION INITIALS
+# REPLACE "2 Battiti" WITH PRODUCTION NAME
 
 """Blender UI integrations for the addon updater.
 
@@ -75,7 +76,7 @@ except Exception as e:
 # not match and have errors. Must be all lowercase and no spaces! Should also
 # be unique among any other addons that could exist (using this updater code),
 # to avoid clashes in operator registration.
-updater.addon = "production_name_here_update"
+updater.addon = "2 Battiti"
 
 
 # -----------------------------------------------------------------------------
@@ -1360,12 +1361,12 @@ def addon_update_register(bl_info):
 
     # Choose your own repository, must match git name for GitHUb and Bitbucket,
     # for GitLab use project ID (numbers only).
-    updater.repo = "SAMPLE_ADDON"
+    updater.repo = "2B_package"
 
     # updater.addon = # define at top of module, MUST be done first
 
     # Website for manual addon download, optional but recommended to set.
-    updater.website = "https://github.com/Betti83771/SAMPLE_ADDON"
+    updater.website = "https://github.com/Betti83771/2B_package"
 
     # Addon subfolder path.
     # "sample/path/to/addon"
