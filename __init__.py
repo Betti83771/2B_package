@@ -69,8 +69,8 @@ from .preferences_ui import Prefs
 
 def register():
     import_and_reload_all_modules([])
-   # addon_update_register(bl_info)
-   # bpy.utils.register_class(Prefs)
+    addon_update_register(bl_info)
+    bpy.utils.register_class(Prefs)
     twoB_ui_register()
     
     
@@ -78,6 +78,6 @@ def register():
 
 def unregister():
     twoB_ui_unregister()
-   # bpy.utils.unregister_class(Prefs)
+    bpy.utils.unregister_class(Prefs)
     addon_update_unregister()
 
