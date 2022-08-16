@@ -1,6 +1,7 @@
 import bpy
 from os import sep
 
+from .rigaprop_script import *
 
 def find_parts_to_replace_in_file_path(old_file_path, old_file_name):
     path_splits = old_file_path.split(sep)
@@ -61,4 +62,17 @@ class TwoBRelocatePaths(bpy.types.Operator):
 
     def execute(self, context):
         relocate_library_paths(self.old_path, self.new_path)
+        return  {'FINISHED'}
+
+
+
+
+class TwoBRigaprop(bpy.types.Operator):
+    """aaa."""
+    bl_idname = "twob.make_proprig_collections_and_metarig"
+    bl_label = "Make collections and metarig"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        rigaprop(context.collection)
         return  {'FINISHED'}
