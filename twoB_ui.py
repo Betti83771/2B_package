@@ -120,7 +120,7 @@ class TwoBRelocatePathPanel(bpy.types.Panel):
 
 class TwoBMakeAnimatablePanel(bpy.types.Panel):
     """Panel for useful operations in the 2B production"""
-    bl_label = "Rendianimabilitamenti"
+    bl_label = "Rendianimabilitazioni"
     bl_idname = "TWOB_PT_makeanimpanel"
     bl_space_type = 'VIEW_3D'
     bl_category = "2B"
@@ -145,6 +145,7 @@ class TwoBMiscPanel(bpy.types.Panel):
         layout.row().operator( "object.bind_all")
         layout.row().operator( "object.remobe_broken_drivers")
         layout.row().operator( "object.refresh_drivers")
+        layout.row().operator( "twob.make_proprig_collections_and_metarig")
         
 class TwoBRenderPanel(bpy.types.Panel):
     """Panel for useful operations in the 2B production"""
@@ -165,6 +166,7 @@ classes = [
     TwoBTimelineUniform,
     TwoBTimelineReset,
     TwoBUpdateComp,
+    TwoBRigaprop,
     TwoBEnableRenderNodesGenerateProps,
     TwoBEnableRenderNodesReset,
     TwoBMakeRigAnimatable,
