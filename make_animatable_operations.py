@@ -7,12 +7,12 @@ def turn_off_widgets_collections(layer_coll:bpy.types.LayerCollection):
             coll.hide_viewport = True 
         turn_off_widgets_collections(coll)
 
-def recursively_find_rig(collection:bpy.types.Collection):
-    rig = None
+def recursively_find_rig(collection:bpy.types.Collection, rig:bpy.types.Object):
+    
     for obj in collection.objects:
         if obj.type == 'ARMATURE': return obj
     for coll in collection.children:
-        rig = recursively_find_rig(coll)
+        rig = recursively_find_rig(coll, rig)
     return rig
 
 def make_linked_rig_animatable(rig:bpy.types.Object, scene:bpy.types.Scene, view_layer: bpy.types.ViewLayer):
@@ -20,8 +20,9 @@ def make_linked_rig_animatable(rig:bpy.types.Object, scene:bpy.types.Scene, view
     override_hierarchy = rig.instance_collection.override_hierarchy_create(scene, view_layer)
     bpy.data.objects.remove(rig)
     turn_off_widgets_collections(view_layer.layer_collection)
-    rig = recursively_find_rig(override_hierarchy)
+    rig = recursively_find_rig(override_hierarchy, None)
     rig.show_in_front = True
+    rig.data.override_hierarchy_create(scene, view_layer)
    # rig.matrix_world = matrix
     rig.pose.bones["root"].matrix = matrix @ rig.matrix_world.inverted()
     if "rig_id" not in rig.data.keys(): return
@@ -47,7 +48,7 @@ def replace_obj_with_prop(obj:bpy.types.Object):
         obj_library = obj.instance_collection.children[0].objects[0].library
     base_file_path = obj_library.name.replace("OBJ", "PROP")
     file_path = obj_library.filepath.replace(obj_library.name, base_file_path)
-    coll_name = obj.name.replace("OBJ", "PROP")
+    coll_name = obj.instance_collection.name.replace("OBJ", "PROP")
     print(file_path)
     try:
         with bpy.data.libraries.load(file_path, link=True) as (data_from, data_to):
@@ -68,7 +69,8 @@ def replace_obj_with_prop(obj:bpy.types.Object):
     
 
 class TwoBMakeRigAnimatable(bpy.types.Operator):
-    """Crea library override del rig selezionato LINKATO MANUALMENTE e lo rende In front"""
+    """Crea library override del rig selezionato LINKATO MANUALMENTE e lo rende In front
+ATTENZIONE NON FUNZIONA SULLA 3.2 :(((("""
     bl_idname = "twob.make_rig_animatable"
     bl_label = "Rendi animabile"
     bl_options = {'UNDO'}
