@@ -74,5 +74,5 @@ class TwoBRigaprop(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        rigaprop(context.collection)
+        rigaprop(context)
         return  {'FINISHED'}
