@@ -15,14 +15,18 @@ def recursively_find_rig(collection:bpy.types.Collection, rig:bpy.types.Object):
         rig = recursively_find_rig(coll, rig)
     return rig
 
-def make_linked_rig_animatable(rig:bpy.types.Object, scene:bpy.types.Scene, view_layer: bpy.types.ViewLayer):
+def make_linked_rig_animatable(context, rig:bpy.types.Object, scene:bpy.types.Scene, view_layer: bpy.types.ViewLayer):
     matrix = rig.matrix_world
-    override_hierarchy = rig.instance_collection.override_hierarchy_create(scene, view_layer)
-    bpy.data.objects.remove(rig)
+    
+    coll_name = rig.name
+    bpy.ops.object.make_override_library()
     turn_off_widgets_collections(view_layer.layer_collection)
+    
+    override_hierarchy = next(coll for coll in bpy.data.collections if coll.name ==coll_name and coll.override_library)
     rig = recursively_find_rig(override_hierarchy, None)
     rig.show_in_front = True
-    rig.data.override_hierarchy_create(scene, view_layer)
+
+    
    # rig.matrix_world = matrix
     rig.pose.bones["root"].matrix = matrix @ rig.matrix_world.inverted()
     if "rig_id" not in rig.data.keys(): return
@@ -70,7 +74,7 @@ def replace_obj_with_prop(obj:bpy.types.Object):
 
 class TwoBMakeRigAnimatable(bpy.types.Operator):
     """Crea library override del rig selezionato LINKATO MANUALMENTE e lo rende In front
-ATTENZIONE NON FUNZIONA SULLA 3.2 :(((("""
+Funziona meglio su Blender 3.1 e 3.3"""
     bl_idname = "twob.make_rig_animatable"
     bl_label = "Rendi animabile"
     bl_options = {'UNDO'}
@@ -82,7 +86,7 @@ ATTENZIONE NON FUNZIONA SULLA 3.2 :(((("""
         return  False
 
     def execute(self, context):
-        make_linked_rig_animatable(context.object, context.scene, context.window.view_layer)
+        make_linked_rig_animatable(context, context.object, context.scene, context.window.view_layer)
         return  {'FINISHED'}
 
 class TwoBMakeSceneLinkedObjPositionable(bpy.types.Operator):
@@ -121,7 +125,7 @@ class TwoBMakeAnimatableReplaceObjProp(bpy.types.Operator):
         if prop_return == "file_not_found" : 
             self.report({'ERROR'}, "File PROP non trovato!")
             return  {'FINISHED'}
-        make_linked_rig_animatable(prop_return, context.scene, context.window.view_layer)
+        make_linked_rig_animatable(context, prop_return, context.scene, context.window.view_layer)
         return  {'FINISHED'}
 
 
