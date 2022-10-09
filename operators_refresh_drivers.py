@@ -23,8 +23,15 @@ def remove_broken_drivers(datablock):
 		broken = False
 		try:
 			eval("datablock." + d.data_path)
+			if d.driver.type != 'SCRIPTED':
+				for v in d.driver.variables:
+					for tar in v.targets:
+						tar_id = tar.id
+						eval(f"tar_id.{tar.data_path}")
+			
 		except (KeyError, AttributeError):
 			broken = True
+		if not len(d.driver.variables): broken = True
 		if broken:
 			datablock.animation_data.drivers.remove(d)
 			print("Remove broken Drivers: removed", d)
