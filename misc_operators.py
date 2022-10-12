@@ -51,7 +51,8 @@ def recursively_find_rig(collection:bpy.types.Collection):
     return rig
 
 class TwoBRelocatePaths(bpy.types.Operator):
-    """Replaces the old path with the new one in every library."""
+    """Replaces the old path with the new one in every library.
+    DEPRECATED IN Blender 3.3"""
     bl_idname = "twob.relocate_paths"
     bl_label = "Relocate library paths"
     bl_options = {'UNDO'}
