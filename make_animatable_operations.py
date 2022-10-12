@@ -15,26 +15,18 @@ def recursively_find_rig(collection:bpy.types.Collection, rig:bpy.types.Object):
         rig = recursively_find_rig(coll, rig)
     return rig
 
-def make_linked_rig_animatable(context, rig:bpy.types.Object, scene:bpy.types.Scene, view_layer: bpy.types.ViewLayer, override_obj=None, orginal_matrix=None):
-    
-    if not override_obj:
-        override_obj = context.object
-        
-    if orginal_matrix:
-        matrix = orginal_matrix
-    else:
-        matrix = rig.matrix_world
-    coll_name = rig.name
-    with context.temp_override(object=override_obj, active_object=override_obj, selected_objects=[override_obj]):
-        bpy.ops.object.make_override_library()
+def make_linked_rig_animatable(rig:bpy.types.Object, scene:bpy.types.Scene, view_layer: bpy.types.ViewLayer):
+    matrix = rig.matrix_world
+    override_hierarchy = rig.instance_collection.override_hierarchy_create(scene, view_layer)
+    bpy.data.objects.remove(rig)
     turn_off_widgets_collections(view_layer.layer_collection)
-    
-    override_hierarchy = next(coll for coll in bpy.data.collections if coll.name ==coll_name and coll.override_library)
     rig = recursively_find_rig(override_hierarchy, None)
     rig.show_in_front = True
-
-    
-   # rig.matrix_world = matrix
+    #override_hierarchy1 = rig.data.override_hierarchy_create(scene, view_layer)
+    rig.override_library.is_system_override = False
+    print(rig.override_library.is_system_override, rig)
+   # for oh in (override_hierarchy1, override_hierarchy):
+    #    oh.override_library.is_system_override = True
     rig.pose.bones["root"].matrix = matrix @ rig.matrix_world.inverted()
     if "rig_id" not in rig.data.keys(): return
     for text in bpy.data.texts:
@@ -62,7 +54,7 @@ def replace_obj_with_prop(obj:bpy.types.Object):
     coll_name = obj.instance_collection.name.replace("OBJ", "PROP")
     print(file_path)
     try:
-        with bpy.data.libraries.load(file_path, link=True, relative=True) as (data_from, data_to):
+        with bpy.data.libraries.load(file_path, link=True) as (data_from, data_to):
             data_to.collections = [coll for coll in data_from.collections if coll == coll_name]
             print(data_from.collections, data_to.collections)
     except OSError:
@@ -93,7 +85,7 @@ Funziona meglio su Blender 3.1 e 3.3"""
         return  False
 
     def execute(self, context):
-        make_linked_rig_animatable(context, context.object, context.scene, context.window.view_layer)
+        make_linked_rig_animatable(context.object, context.scene, context.window.view_layer)
         return  {'FINISHED'}
 
 class TwoBMakeSceneLinkedObjPositionable(bpy.types.Operator):
@@ -128,12 +120,11 @@ class TwoBMakeAnimatableReplaceObjProp(bpy.types.Operator):
         return  True
 
     def execute(self, context):
-        original_matrix = context.object.matrix_world
         prop_return  = replace_obj_with_prop(context.object)
         if prop_return == "file_not_found" : 
             self.report({'ERROR'}, "File PROP non trovato!")
             return  {'FINISHED'}
-        make_linked_rig_animatable(context, prop_return, context.scene, context.window.view_layer, override_obj=prop_return, orginal_matrix=original_matrix)
+        make_linked_rig_animatable(prop_return, context.scene, context.window.view_layer)
         return  {'FINISHED'}
 
 
