@@ -15,11 +15,18 @@ def recursively_find_rig(collection:bpy.types.Collection, rig:bpy.types.Object):
         rig = recursively_find_rig(coll, rig)
     return rig
 
-def make_linked_rig_animatable(context, rig:bpy.types.Object, scene:bpy.types.Scene, view_layer: bpy.types.ViewLayer):
-    matrix = rig.matrix_world
+def make_linked_rig_animatable(context, rig:bpy.types.Object, scene:bpy.types.Scene, view_layer: bpy.types.ViewLayer, override_obj=None, orginal_matrix=None):
     
+    if not override_obj:
+        override_obj = context.object
+        
+    if orginal_matrix:
+        matrix = orginal_matrix
+    else:
+        matrix = rig.matrix_world
     coll_name = rig.name
-    bpy.ops.object.make_override_library()
+    with context.temp_override(object=override_obj, active_object=override_obj, selected_objects=[override_obj]):
+        bpy.ops.object.make_override_library()
     turn_off_widgets_collections(view_layer.layer_collection)
     
     override_hierarchy = next(coll for coll in bpy.data.collections if coll.name ==coll_name and coll.override_library)
@@ -55,7 +62,7 @@ def replace_obj_with_prop(obj:bpy.types.Object):
     coll_name = obj.instance_collection.name.replace("OBJ", "PROP")
     print(file_path)
     try:
-        with bpy.data.libraries.load(file_path, link=True) as (data_from, data_to):
+        with bpy.data.libraries.load(file_path, link=True, relative=True) as (data_from, data_to):
             data_to.collections = [coll for coll in data_from.collections if coll == coll_name]
             print(data_from.collections, data_to.collections)
     except OSError:
@@ -121,11 +128,12 @@ class TwoBMakeAnimatableReplaceObjProp(bpy.types.Operator):
         return  True
 
     def execute(self, context):
+        original_matrix = context.object.matrix_world
         prop_return  = replace_obj_with_prop(context.object)
         if prop_return == "file_not_found" : 
             self.report({'ERROR'}, "File PROP non trovato!")
             return  {'FINISHED'}
-        make_linked_rig_animatable(context, prop_return, context.scene, context.window.view_layer)
+        make_linked_rig_animatable(context, prop_return, context.scene, context.window.view_layer, override_obj=prop_return, orginal_matrix=original_matrix)
         return  {'FINISHED'}
 
 
