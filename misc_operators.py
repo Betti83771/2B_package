@@ -16,6 +16,7 @@ def rename_all_paths_with_filename(old_file_name="SCE000"):
     """filewise"""
     name_to_replace = bpy.path.basename(bpy.data.filepath).replace("3D_", "").replace(".blend", "")
     for scene in bpy.data.scenes:
+        if scene.library != None: continue
         for node in scene.node_tree.nodes:
             existing_base_path = getattr(node, "base_path", None)
             if not existing_base_path: continue
