@@ -88,7 +88,6 @@ class TwoBCompositingPanel(bpy.types.Panel):
         layout.row().operator( "twob.rename_paths_filename")
         layout.row().separator
 
-
 class TwoBTimelinePanel(bpy.types.Panel):
     """Panel for useful operations in the 2B production"""
     bl_label = "Timeline Operations"
@@ -101,6 +100,7 @@ class TwoBTimelinePanel(bpy.types.Panel):
         layout = self.layout
         layout.row().operator( "twob.timeline_reset")
         layout.row().operator( "twob.timeline_uniform")
+        layout.row().prop( context.window_manager, "twob_use_overwrite_markers")
 
 class TwoBRelocatePathPanel(bpy.types.Panel):
     """Panel for useful operations in the 2B production"""
@@ -203,6 +203,8 @@ def twoB_ui_register():
                         default=f"//")
     bpy.types.WindowManager.twob_anm_cut_number_of_pre_and_post_frames = bpy.props.IntProperty(
         default=3, name="Pre/post roll frames", min =0)
+    bpy.types.WindowManager.twob_use_overwrite_markers = bpy.props.BoolProperty(default=True,
+                                                    name="Overwrite Markers")
     bpy.types.Scene.twob_not_yet_generated_props = bpy.props.BoolProperty(default=True)
     for cls in classes:
         bpy.utils.register_class(cls)
@@ -217,5 +219,6 @@ def twoB_ui_unregister():
     del bpy.types.WindowManager.twob_relocate_paths_new_path
     del bpy.types.WindowManager.twob_anm_cut_number_of_pre_and_post_frames
     del  bpy.types.WindowManager.twob_not_yet_generated_props
+    del bpy.types.WindowManager.twob_use_overwrite_markers
     
     

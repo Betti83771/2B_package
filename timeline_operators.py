@@ -1,6 +1,6 @@
 import bpy
 
-def uniform_timelines(from_scene:bpy.types.Scene, overwrite_markers=True):
+def uniform_timelines(from_scene:bpy.types.Scene, overwrite_markers=True, frame_set=True):
     """si copia anche i marker (da leggere con il tono della musica del latte e caffe')"""
     if overwrite_markers:
         marker_dict = {}
@@ -9,7 +9,8 @@ def uniform_timelines(from_scene:bpy.types.Scene, overwrite_markers=True):
 
     for scene in bpy.data.scenes:
         if scene.name.endswith("anm"): continue
-        scene.frame_set(from_scene.frame_current)
+        if frame_set:
+            scene.frame_set(from_scene.frame_current)
         scene.frame_start = from_scene.frame_start
         scene.frame_end = from_scene.frame_end
         if overwrite_markers:
@@ -37,7 +38,7 @@ class TwoBTimelineReset(bpy.types.Operator):
 
     def execute(self, context):
         anm_scene = next((sce for sce in bpy.data.scenes.keys() if "ANM" in sce), None)
-        uniform_timelines(bpy.data.scenes[anm_scene], overwrite_markers=False)
+        uniform_timelines(bpy.data.scenes[anm_scene], overwrite_markers=context.window_manager.twob_use_overwrite_markers, frame_set=False)
         put_cursor_at_starting_frame()
         return  {'FINISHED'}
 
@@ -52,5 +53,5 @@ class TwoBTimelineUniform(bpy.types.Operator):
         return  True
 
     def execute(self, context):
-        uniform_timelines(context.scene)
+        uniform_timelines(context.scene, overwrite_markers=context.window_manager.twob_use_overwrite_markers)
         return  {'FINISHED'}
