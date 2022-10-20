@@ -33,8 +33,14 @@ def rename_all_paths_with_filename(old_file_name="SCE000"):
 def relocate_library_paths(old_path, new_path):
     old_path = old_path.replace("//", "")
     new_path = new_path.replace("//", "")
+    relocated_libraries = []
     for library in bpy.data.libraries:
+        old_filepath = library.filepath
         library.filepath = library.filepath.replace(old_path, new_path)
+        if library.filepath != old_filepath:
+            relocated_libraries.append(library.name)
+    return relocated_libraries
+
 
 def turn_off_widgets_collections(layer_coll:bpy.types.LayerCollection):
     """scenewise"""
@@ -52,8 +58,7 @@ def recursively_find_rig(collection:bpy.types.Collection):
     return rig
 
 class TwoBRelocatePaths(bpy.types.Operator):
-    """Replaces the old path with the new one in every library.
-    DEPRECATED IN Blender 3.3"""
+    """Replaces the old path with the new one in every library."""
     bl_idname = "twob.relocate_paths"
     bl_label = "Relocate library paths"
     bl_options = {'UNDO'}
@@ -63,7 +68,11 @@ class TwoBRelocatePaths(bpy.types.Operator):
 
 
     def execute(self, context):
-        relocate_library_paths(self.old_path, self.new_path)
+        relocated_libraries = relocate_library_paths(self.old_path, self.new_path)
+        if len(relocated_libraries):
+            self.report(type={"INFO"}, message=f"Relocated Libraries:{str(relocated_libraries)}")
+        else:
+            self.report(type={"WARNING"}, message="No libraries found o relocate!")
         return  {'FINISHED'}
 
 
