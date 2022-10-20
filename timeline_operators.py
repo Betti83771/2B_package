@@ -10,7 +10,7 @@ def uniform_timelines(from_scene:bpy.types.Scene, overwrite_markers=True, frame_
     for scene in bpy.data.scenes:
         if scene.name.endswith("anm"): continue
         if frame_set:
-            scene.frame_set(from_scene.frame_current)
+            scene.frame_current = from_scene.frame_current
         scene.frame_start = from_scene.frame_start
         scene.frame_end = from_scene.frame_end
         if overwrite_markers:
