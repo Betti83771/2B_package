@@ -25,6 +25,42 @@ def put_cursor_at_starting_frame():
         scene.frame_set(scene.frame_start)
     return
 
+def one_frame_timeline_enable(current_scene: bpy.types.Scene):
+    """the property Scene.twob_timeline_temp is registered in the file twoB_ui.py"""
+    frame_start = current_scene.frame_start
+    frame_end = current_scene.frame_end
+    current_scene.twob_timeline_temp[0] = frame_start
+    current_scene.twob_timeline_temp[1] = frame_end
+    current_scene.frame_start = current_scene.frame_current
+    current_scene.frame_end = current_scene.frame_current
+
+def one_frame_timeline_disable(current_scene: bpy.types.Scene):
+    """the property Scene.twob_timeline_temp is registered in the file twoB_ui.py"""
+    current_scene.frame_start =  current_scene.twob_timeline_temp[0]
+    current_scene.frame_end = current_scene.twob_timeline_temp[1]
+    current_scene.twob_timeline_temp[0] = 0
+    current_scene.twob_timeline_temp[1] = 0
+     
+
+class TwoBTimelineOneFrame(bpy.types.Operator):
+    """Switch the timeline to render only the current frame while keeping the old timeline in memory"""
+    bl_idname = "twob.timeline_oneframe"
+    bl_label = "Toggle 1-frame timeline"
+    bl_options = {'UNDO'}
+
+    enable: bpy.props.BoolProperty(default=True)
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        if self.enable:
+            one_frame_timeline_enable(context.scene)
+        else:
+            one_frame_timeline_disable(context.scene)
+        return  {'FINISHED'}
+
 class TwoBTimelineReset(bpy.types.Operator):
     """Uniform all timelines to the anm Scene; also move the timeline cursors to the starting frames"""
     bl_idname = "twob.timeline_reset"

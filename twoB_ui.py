@@ -101,6 +101,12 @@ class TwoBTimelinePanel(bpy.types.Panel):
         layout.row().operator( "twob.timeline_reset")
         layout.row().operator( "twob.timeline_uniform")
         layout.row().prop( context.window_manager, "twob_use_overwrite_markers")
+        layout.separator()
+        
+        if context.scene.twob_timeline_temp[0] == 0 and context.scene.twob_timeline_temp[1] == 0:
+            layout.row().operator( "twob.timeline_oneframe", text="Enable 1-frame timeline").enable = True
+        else:
+            layout.row().operator( "twob.timeline_oneframe", text="Disable 1-frame timeline").enable = False
 
 class TwoBRelocatePathPanel(bpy.types.Panel):
     """Panel for useful operations in the 2B production"""
@@ -165,6 +171,7 @@ classes = [
     RefreshDrivers,
     TwoBTimelineUniform,
     TwoBTimelineReset,
+    TwoBTimelineOneFrame,
     TwoBUpdateComp,
     TwoBRigaprop,
     TwoBEnableRenderNodesGenerateProps,
@@ -206,6 +213,7 @@ def twoB_ui_register():
     bpy.types.WindowManager.twob_use_overwrite_markers = bpy.props.BoolProperty(default=True,
                                                     name="Overwrite Markers")
     bpy.types.Scene.twob_not_yet_generated_props = bpy.props.BoolProperty(default=True)
+    bpy.types.Scene.twob_timeline_temp = bpy.props.IntVectorProperty(default=(0, 0), size=2)
     for cls in classes:
         bpy.utils.register_class(cls)
 
@@ -213,6 +221,7 @@ def twoB_ui_register():
 def twoB_ui_unregister():
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
+    del bpy.types.Scene.twob_timeline_temp
     del bpy.types.WindowManager.twob_file_zero
     del bpy.types.WindowManager.twob_anm_destination_folder
     del bpy.types.WindowManager.twob_relocate_paths_old_path
