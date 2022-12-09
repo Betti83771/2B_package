@@ -74,9 +74,9 @@ class TwoBEnableRenderNodesPanel(bpy.types.Panel):
     """Panel for useful operations in the 2B production"""
     bl_label = "Enable / disable render nodes"
     bl_idname = "TWOB_PT_enablerendernodespanel"
-    bl_space_type = 'VIEW_3D'
     bl_category = "2B"
     bl_region_type = 'UI'
+    
 
     def draw(self, context):
         layout = self.layout
@@ -97,4 +97,15 @@ class TwoBEnableRenderNodesPanel(bpy.types.Panel):
             col = layout.column(align=True)
             col.row().operator("twob.delete_render_nodes_boolprops")
 
-        
+class TwoBEnableRenderNodesPanel_VIEWPORT(TwoBEnableRenderNodesPanel):
+    bl_space_type = 'VIEW_3D'
+    bl_parent_id = "TWOB_PT_renderpanel"
+    bl_idname = "TWOB_PT_enablerendernodespanelVIEWPORT"
+
+class TwoBEnableRenderNodesPanel_COMPOSITOR(TwoBEnableRenderNodesPanel):
+    bl_space_type = 'NODE_EDITOR'
+    bl_idname = "TWOB_PT_enablerendernodespanelCOMPOSITOR"
+
+    @classmethod
+    def poll(cls, context):
+        return context.area.ui_type == 'CompositorNodeTree'

@@ -189,7 +189,8 @@ classes = [
     TwoBRelocatePathPanel,
     TwoBRenderPanel,
     TwoBMakeAnmFilesSubpanel,
-    TwoBEnableRenderNodesPanel,
+    TwoBEnableRenderNodesPanel_COMPOSITOR,
+    TwoBEnableRenderNodesPanel_VIEWPORT,
     NewMistPanel
 
 ]
