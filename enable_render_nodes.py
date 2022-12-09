@@ -17,8 +17,10 @@ def erngp_prop_update(self, context:bpy.types.Context):
     for node_comp in given_node_companions:
         if self.prop:
             node_comp.mute = False
+            context.scene.view_layers[self.prop.name].use = False
         else:
             node_comp.mute = True
+            context.scene.view_layers[self.prop.name].use = True
 
 
 def erngp_generate_boolprops(context:bpy.types.Context):
@@ -34,8 +36,10 @@ def erngp_prop_update_{layer_name}(self, context):
     for node_comp in given_node_companions:
         if self.twob_renderboolprop_{layer_name}:
             context.scene.node_tree.nodes[node_comp].mute = False
+            context.scene.view_layers["{layer_name}"].use = True
         else:
             context.scene.node_tree.nodes[node_comp].mute = True
+            context.scene.view_layers["{layer_name}"].use = False
 bpy.types.Scene.twob_renderboolprop_{layer_name} = bpy.props.BoolProperty(name="twob_renderboolprop_{layer_name}", default=True, update=erngp_prop_update_{layer_name})""")
     
 def  erngp_delete_boolprops(context):
