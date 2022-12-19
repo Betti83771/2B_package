@@ -2,13 +2,16 @@ import bpy
 
 def uniform_timelines(from_scene:bpy.types.Scene, overwrite_markers=True, frame_set=True):
     """si copia anche i marker (da leggere con il tono della musica del latte e caffe')"""
+    
     if overwrite_markers:
         marker_dict = {}
         for marker in from_scene.timeline_markers:
             marker_dict[marker.name] = marker.frame
 
     for scene in bpy.data.scenes:
-        if scene.name.endswith("anm"): continue
+   #     if scene.name.endswith("anm"): continue
+        if scene.twob_timeline_temp[0] != 0 and scene.twob_timeline_temp[1] != 0:
+            one_frame_timeline_disable(scene)
         if frame_set:
             scene.frame_current = from_scene.frame_current
         scene.frame_start = from_scene.frame_start
