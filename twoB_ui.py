@@ -69,7 +69,7 @@ class TwoBRenamePaths(bpy.types.Operator):
      #   return cls.file_zero_name != ""
 
     def execute(self, context):
-        rename_all_paths_with_filename()
+        rename_all_paths_with_filename_2()
         return{'FINISHED'}
 
 class TwoBCompositingPanel(bpy.types.Panel):
