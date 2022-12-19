@@ -4,6 +4,7 @@ from os import sep
 from .rigaprop_script import *
 
 def find_parts_to_replace_in_file_path(old_file_path, old_file_name):
+    """(DEPRECATED)"""
     path_splits = old_file_path.split(sep)
     if len(path_splits) < 2:
         print("2B: Separator error while replacing paths. Please use the file zero's native OS or convert its paths.")
@@ -13,7 +14,7 @@ def find_parts_to_replace_in_file_path(old_file_path, old_file_name):
     return "no_replacement"
 
 def rename_all_paths_with_filename(old_file_name="SCE000"):
-    """filewise"""
+    """(DEPRECATED) filewise"""
     name_to_replace = bpy.path.basename(bpy.data.filepath).replace("3D_", "").replace(".blend", "")
     for scene in bpy.data.scenes:
         if scene.library != None: continue
@@ -27,6 +28,43 @@ def rename_all_paths_with_filename(old_file_name="SCE000"):
         if to_be_replaced_render == "no_replacement": continue
         scene.render.filepath = scene.render.filepath.replace(to_be_replaced_render, name_to_replace)
 
+def pattern_find_SCE(base_path:str):
+    char_placeholder = 0
+    for idx, char in enumerate(base_path):
+        if char_placeholder == 1:
+            if char == "C":
+                char_placeholder = 2
+        elif char_placeholder == 2:
+            if char == "E":
+                E_idx = idx
+        else:
+            if char == "S":
+                char_placeholder = 1
+    if char_placeholder == 0:
+        return "nopatt"
+    patt = "SCE"
+    for j in range(1, 11):
+        patt = patt + base_path[E_idx+j]
+    return patt
+
+
+def rename_all_paths_with_filename_2():
+    """filewise"""
+    to_replace_with = pattern_find_SCE(bpy.path.basename(bpy.data.filepath))
+    if to_replace_with == "nopatt":
+        return
+    for scene in bpy.data.scenes:
+        if scene.library != None: continue # se la scena è linkata, non fare niente
+        for node in scene.node_tree.nodes: # per ogni nodo nel compositor node tree della scena:
+            existing_base_path = getattr(node, "base_path", None) # prendi il base path del nodo
+            print(existing_base_path)
+            if not existing_base_path: continue # se non c'è il base path, non fare più niente
+            to_be_replaced = pattern_find_SCE(existing_base_path)
+            if to_be_replaced != "nopatt":
+                node.base_path = existing_base_path.replace(to_be_replaced, to_replace_with)
+        ren_to_be_replaced = pattern_find_SCE(scene.render.filepath)
+        if ren_to_be_replaced != "nopatt":
+            scene.render.filepath = scene.render.filepath.replace(ren_to_be_replaced, to_replace_with)
 
 
 
