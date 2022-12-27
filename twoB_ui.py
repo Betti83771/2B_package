@@ -176,6 +176,8 @@ classes = [
     TwoBRigaprop,
     TwoBEnableRenderNodesGenerateProps,
     TwoBEnableRenderNodesReset,
+    TwoBLayerName,
+    TwoBFrameNodeData,
     TwoBMakeRigAnimatable,
     TwoBMakeSceneLinkedObjPositionable,
     TwoBMakeAnimatableReplaceObjProp,
@@ -213,13 +215,16 @@ def twoB_ui_register():
         default=3, name="Pre/post roll frames", min =0)
     bpy.types.WindowManager.twob_use_overwrite_markers = bpy.props.BoolProperty(default=True,
                                                     name="Overwrite Markers")
-    bpy.types.Scene.twob_not_yet_generated_props = bpy.props.BoolProperty(default=True)
+    
     bpy.types.Scene.twob_timeline_temp = bpy.props.IntVectorProperty(default=(0, 0), size=2)
     for cls in classes:
         bpy.utils.register_class(cls)
+    
+    ern_register_props()
 
 
 def twoB_ui_unregister():
+    ern_unregister_props()
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
     del bpy.types.Scene.twob_timeline_temp
@@ -228,7 +233,8 @@ def twoB_ui_unregister():
     del bpy.types.WindowManager.twob_relocate_paths_old_path
     del bpy.types.WindowManager.twob_relocate_paths_new_path
     del bpy.types.WindowManager.twob_anm_cut_number_of_pre_and_post_frames
-    del  bpy.types.WindowManager.twob_not_yet_generated_props
+    
     del bpy.types.WindowManager.twob_use_overwrite_markers
+    
     
     
