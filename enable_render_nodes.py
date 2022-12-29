@@ -89,6 +89,7 @@ bpy.types.Scene.twob_renderboolprop_{layer_data.display_name} = bpy.props.BoolPr
 
 class TwoBLayerName(bpy.types.PropertyGroup):
     layer: bpy.props.StringProperty()
+ 
     
 
 class TwoBFrameNodeData(bpy.types.PropertyGroup):
@@ -186,6 +187,8 @@ class TwoBEnableRenderNodesPanel_COMPOSITOR(TwoBEnableRenderNodesPanel):
         return context.area.ui_type == 'CompositorNodeTree'
 
 def ern_register_props():
+    bpy.utils.register_class(TwoBLayerName)
+    bpy.utils.register_class(TwoBFrameNodeData)
     bpy.types.Scene.twob_not_yet_generated_props = bpy.props.BoolProperty(default=True)
     bpy.types.Scene.twob_layernamedata = bpy.props.CollectionProperty(type=TwoBFrameNodeData)
 
