@@ -10,14 +10,19 @@ def followLinks(node_in:bpy.types.Node, node_list):
     return node_list
 
 def check_if_use_for_render_has_to_be_disabled(layer:str, display_name:str, node_tree:bpy.types.CompositorNodeTree):
+    if display_name.startswith("CHR"):
+        return check_if_use_for_render_has_to_be_disabled_by_name(layer, display_name, node_tree)
     nodes_that_use_the_layer  = [node for node in node_tree.nodes if  node.bl_idname == 'CompositorNodeRLayers' and node.layer == layer]
     for node in nodes_that_use_the_layer: # if just one has a different frame group, don't disable the layer
         if not node.parent: continue
         if not node.parent.name.startswith(display_name): 
-            if not display_name.startswith("CHR"):
-                return False
+            return False
     return True
 
+def check_if_use_for_render_has_to_be_disabled_by_name(layer:str, display_name:str, node_tree:bpy.types.CompositorNodeTree):
+    if layer.startswith(display_name):
+        return True
+    return False
 
 def  erngp_delete_boolprops(scene:bpy.types.Scene):
     for name, prop in scene.items():
@@ -206,7 +211,7 @@ class TwoBEnableRenderNodesGenerateProps(bpy.types.Operator):
             if layer_data.luci_2D != "" and layer_data.luci_3D != "":
                 exec(f"context.scene.twob_renderenumprop_{layer_data.display_name} = '2D Lights'") 
             if layer_data.ombre != "":
-                exec(f"context.scene.twob_renderboolprop_ombre_{layer_data.display_name} = True") 
+                exec(f"context.scene.twob_renderboolprop_ombre_{layer_data.display_name} = False") 
 
         return  {'FINISHED'}
 
