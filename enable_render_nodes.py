@@ -10,8 +10,8 @@ def followLinks(node_in:bpy.types.Node, node_list):
     return node_list
 
 def check_if_use_for_render_has_to_be_disabled(layer:str, display_name:str, node_tree:bpy.types.CompositorNodeTree):
-    if display_name.startswith("CHR"):
-        return check_if_use_for_render_has_to_be_disabled_by_name(layer, display_name, node_tree)
+ #   if display_name.startswith("CHR"):
+    return check_if_use_for_render_has_to_be_disabled_by_name(layer, display_name, node_tree)
     nodes_that_use_the_layer  = [node for node in node_tree.nodes if  node.bl_idname == 'CompositorNodeRLayers' and node.layer == layer]
     for node in nodes_that_use_the_layer: # if just one has a different frame group, don't disable the layer
         if not node.parent: continue
