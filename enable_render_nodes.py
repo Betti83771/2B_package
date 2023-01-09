@@ -56,7 +56,8 @@ def erngp_boolprop_update_{layer_data.display_name}(self, context):
                     node.mute = False
         for layer in {base_layers}:
             if layer in context.scene.view_layers.keys():
-                context.scene.view_layers[layer].use = True
+                if check_if_use_for_render_has_to_be_disabled_by_name(layer, "{layer_data.display_name}", context.scene.node_tree):  
+                    context.scene.view_layers[layer].use = True
     else:
         for node in context.scene.node_tree.nodes:
             if node.parent == context.scene.node_tree.nodes["{layer_data.base}"]:
