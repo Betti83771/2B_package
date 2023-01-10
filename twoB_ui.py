@@ -47,7 +47,7 @@ class TwoBUpdateComp(bpy.types.Operator):
         return True
 
     def execute(self, context):
-        updated_scenes = update_comp_node_tree_func(context.window_manager.twob_file_zero)
+        updated_scenes = update_comp_node_tree_func(self, context.window_manager.twob_file_zero)
         if updated_scenes == "file_not_found": 
             self.report({'ERROR'}, f"File not found: {context.window_manager.twob_file_zero}")
             return {'FINISHED'}
