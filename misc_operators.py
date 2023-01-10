@@ -42,7 +42,9 @@ def pattern_find_SCE(base_path:str):
                 char_placeholder = 1
     if char_placeholder == 0:
         return "nopatt"
+    #print("E_idx",E_idx,base_path)
     patt = "SCE"
+    if E_idx+10 > len(base_path): return "nopatt"
     for j in range(1, 11):
         patt = patt + base_path[E_idx+j]
     return patt
@@ -57,7 +59,7 @@ def rename_all_paths_with_filename_2():
         if scene.library != None: continue # se la scena è linkata, non fare niente
         for node in scene.node_tree.nodes: # per ogni nodo nel compositor node tree della scena:
             existing_base_path = getattr(node, "base_path", None) # prendi il base path del nodo
-            print(existing_base_path)
+         #   print(existing_base_path)
             if not existing_base_path: continue # se non c'è il base path, non fare più niente
             to_be_replaced = pattern_find_SCE(existing_base_path)
             if to_be_replaced != "nopatt":
