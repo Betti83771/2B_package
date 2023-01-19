@@ -44,9 +44,14 @@ def pattern_find_SCE(base_path:str):
         return "nopatt"
     #print("E_idx",E_idx,base_path)
     patt = "SCE"
-    if E_idx+10 > len(base_path): return "nopatt"
-    for j in range(1, 11):
-        patt = patt + base_path[E_idx+j]
+    if E_idx+10 > len(base_path): #check if too short; if too short, it's a possible only SCE
+        if E_idx+3 > len(base_path): return "nopatt" # check if too short even for only SCE
+        for j in range(1, 4): # add up the next 3 characters
+            if not base_path[E_idx+j].isdigit(): return "nopatt"
+            patt = patt + base_path[E_idx+j]
+    else:
+        for j in range(1, 11):# add up the next 10 characters
+            patt = patt + base_path[E_idx+j]
     return patt
 
 
@@ -63,11 +68,16 @@ def rename_all_paths_with_filename_2():
             if not existing_base_path: continue # se non c'è il base path, non fare più niente
             to_be_replaced = pattern_find_SCE(existing_base_path)
             if to_be_replaced != "nopatt":
-                node.base_path = existing_base_path.replace(to_be_replaced, to_replace_with)
+                if len(to_be_replaced) > 10:
+                    node.base_path = existing_base_path.replace(to_be_replaced, to_replace_with)
+                else:
+                    node.base_path = existing_base_path.replace(to_be_replaced, to_replace_with[:6])
         ren_to_be_replaced = pattern_find_SCE(scene.render.filepath)
         if ren_to_be_replaced != "nopatt":
-            scene.render.filepath = scene.render.filepath.replace(ren_to_be_replaced, to_replace_with)
-
+            if len(ren_to_be_replaced) > 10:
+                scene.render.filepath = scene.render.filepath.replace(ren_to_be_replaced, to_replace_with)
+            else:
+                scene.render.filepath = scene.render.filepath.replace(ren_to_be_replaced, to_replace_with[6:])
 
 
 def relocate_library_paths(old_path, new_path):
