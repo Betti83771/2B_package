@@ -1,6 +1,6 @@
 import bpy
 from os import sep
-from .misc_operators import rename_all_paths_with_filename
+from .misc_operators import rename_all_paths_with_filename_2
 
 def saveas_cut_file(base_filename:str, destination_path:str, cut_name:str):
     """destination_path: 3D_ANM_SCE000 folder, in which to create the anm cut blends
@@ -64,7 +64,7 @@ def make_anm_files_func(scene_name, destination_path, roll_frames):
             scene.timeline_markers.new("POST", frame=value[1]) 
         else:
             scene.timeline_markers.new("END", frame=original_frame_end)
-        rename_all_paths_with_filename(old_file_name=prev_file_name)
+        rename_all_paths_with_filename_2()
         saveas_cut_file(base_filename, bpy.path.abspath(destination_path), key)
         prev_file_name = bpy.path.basename(bpy.data.filepath)
     bpy.ops.wm.open_mainfile(filepath=lay_filepath )
