@@ -28,6 +28,29 @@ def rename_all_paths_with_filename(old_file_name="SCE000"):
         if to_be_replaced_render == "no_replacement": continue
         scene.render.filepath = scene.render.filepath.replace(to_be_replaced_render, name_to_replace)
 
+def pattern_find_SCE_CUT(base_path:str):
+    char_placeholder = 0
+    for idx, char in enumerate(base_path):
+        if char_placeholder == 1:
+            if char == "C":
+                char_placeholder = 2
+        elif char_placeholder == 2:
+            if char == "E":
+                E_idx = idx
+        else:
+            if char == "S":
+                char_placeholder = 1
+    if char_placeholder == 0:
+        return "nopatt"
+    #print("E_idx",E_idx,base_path)
+    patt = "SCE"
+    if E_idx+10 > len(base_path): return "nopatt" #check if too short; if too short, it's a possible only SCE
+    for j in range(1, 11):# add up the next 10 characters
+        patt = patt + base_path[E_idx+j]
+    if "CUT" in patt:
+        return patt
+    else: return "nopatt"
+
 def pattern_find_SCE(base_path:str):
     char_placeholder = 0
     for idx, char in enumerate(base_path):
@@ -49,15 +72,12 @@ def pattern_find_SCE(base_path:str):
         for j in range(1, 4): # add up the next 3 characters
             if not base_path[E_idx+j].isdigit(): return "nopatt"
             patt = patt + base_path[E_idx+j]
-    else:
-        for j in range(1, 11):# add up the next 10 characters
-            patt = patt + base_path[E_idx+j]
     return patt
 
 
 def rename_all_paths_with_filename_2():
     """filewise"""
-    to_replace_with = pattern_find_SCE(bpy.path.basename(bpy.data.filepath))
+    to_replace_with = pattern_find_SCE_CUT(bpy.path.basename(bpy.data.filepath))
     if to_replace_with == "nopatt":
         return
     for scene in bpy.data.scenes:
@@ -66,18 +86,16 @@ def rename_all_paths_with_filename_2():
             existing_base_path = getattr(node, "base_path", None) # prendi il base path del nodo
          #   print(existing_base_path)
             if not existing_base_path: continue # se non c'è il base path, non fare più niente
-            to_be_replaced = pattern_find_SCE(existing_base_path)
-            if to_be_replaced != "nopatt":
-                if len(to_be_replaced) > 10:
-                    node.base_path = existing_base_path.replace(to_be_replaced, to_replace_with)
-                else:
-                    node.base_path = existing_base_path.replace(to_be_replaced, to_replace_with[:6])
-        ren_to_be_replaced = pattern_find_SCE(scene.render.filepath)
-        if ren_to_be_replaced != "nopatt":
-            if len(ren_to_be_replaced) > 10:
-                scene.render.filepath = scene.render.filepath.replace(ren_to_be_replaced, to_replace_with)
-            else:
-                scene.render.filepath = scene.render.filepath.replace(ren_to_be_replaced, to_replace_with[6:])
+            to_be_replaced_SCE = pattern_find_SCE(existing_base_path)
+            to_be_replaced_SCE_CUT = pattern_find_SCE_CUT(existing_base_path)
+            if to_be_replaced_SCE != "nopatt" and to_be_replaced_SCE_CUT != "nopatt":
+                node.base_path = existing_base_path.replace(to_be_replaced_SCE_CUT, to_replace_with)
+                node.base_path = existing_base_path.replace(to_be_replaced_SCE, to_replace_with[:6])
+        ren_to_be_replaced_SCE = pattern_find_SCE(scene.render.filepath)
+        ren_to_be_replaced_SCE_CUT = pattern_find_SCE_CUT(scene.render.filepath)
+        if ren_to_be_replaced_SCE != "nopatt" and ren_to_be_replaced_SCE_CUT != "nopatt":
+            scene.render.filepath = scene.render.filepath.replace(ren_to_be_replaced_SCE_CUT, to_replace_with)
+            scene.render.filepath = scene.render.filepath.replace(ren_to_be_replaced_SCE, to_replace_with[6:])
 
 
 def relocate_library_paths(old_path, new_path):
