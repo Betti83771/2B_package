@@ -3,82 +3,13 @@ from os import sep
 
 from .rigaprop_script import *
 
-def find_parts_to_replace_in_file_path(old_file_path, old_file_name):
-    """(DEPRECATED)"""
-    path_splits = old_file_path.split(sep)
-    if len(path_splits) < 2:
-        print("2B: Separator error while replacing paths. Please use the file zero's native OS or convert its paths.")
-        return "wrong os"
-    for split in path_splits:
-        if old_file_name in split: return split
-    return "no_replacement"
-
-def rename_all_paths_with_filename(old_file_name="SCE000"):
-    """(DEPRECATED) filewise"""
-    name_to_replace = bpy.path.basename(bpy.data.filepath).replace("3D_", "").replace(".blend", "")
-    for scene in bpy.data.scenes:
-        if scene.library != None: continue
-        for node in scene.node_tree.nodes:
-            existing_base_path = getattr(node, "base_path", None)
-            if not existing_base_path: continue
-            to_be_replaced = find_parts_to_replace_in_file_path(existing_base_path, old_file_name)
-            if to_be_replaced == "no_replacement": continue
-            node.base_path = existing_base_path.replace(to_be_replaced, name_to_replace)
-        to_be_replaced_render = find_parts_to_replace_in_file_path(scene.render.filepath, old_file_name)
-        if to_be_replaced_render == "no_replacement": continue
-        scene.render.filepath = scene.render.filepath.replace(to_be_replaced_render, name_to_replace)
-
-def pattern_find_SCE_CUT(base_path:str):
-    char_placeholder = 0
-    for idx, char in enumerate(base_path):
-        if char_placeholder == 1:
-            if char == "C":
-                char_placeholder = 2
-        elif char_placeholder == 2:
-            if char == "E":
-                E_idx = idx
-        else:
-            if char == "S":
-                char_placeholder = 1
-    if char_placeholder == 0:
-        return "nopatt"
-    #print("E_idx",E_idx,base_path)
-    patt = "SCE"
-    if E_idx+10 > len(base_path): return "nopatt" #check if too short; if too short, it's a possible only SCE
-    for j in range(1, 11):# add up the next 10 characters
-        patt = patt + base_path[E_idx+j]
-    if "CUT" in patt:
-        return patt
-    else: return "nopatt"
-
-def pattern_find_SCE(base_path:str):
-    char_placeholder = 0
-    for idx, char in enumerate(base_path):
-        if char_placeholder == 1:
-            if char == "C":
-                char_placeholder = 2
-        elif char_placeholder == 2:
-            if char == "E":
-                E_idx = idx
-        else:
-            if char == "S":
-                char_placeholder = 1
-    if char_placeholder == 0:
-        return "nopatt"
-    #print("E_idx",E_idx,base_path)
-    patt = "SCE"
-    if E_idx+10 > len(base_path): #check if too short; if too short, it's a possible only SCE
-        if E_idx+3 > len(base_path): return "nopatt" # check if too short even for only SCE
-        for j in range(1, 4): # add up the next 3 characters
-            if not base_path[E_idx+j].isdigit(): return "nopatt"
-            patt = patt + base_path[E_idx+j]
-    return patt
 
 
 def rename_all_paths_with_filename_2():
     """filewise"""
-    to_replace_with = pattern_find_SCE_CUT(bpy.path.basename(bpy.data.filepath))
-    if to_replace_with == "nopatt":
+    to_replace_with_SCE = "SCE" + bpy.path.basename(bpy.data.filepath).split("SCE")[-1][:3]
+    to_replace_with_CUT = "CUT" + bpy.path.basename(bpy.data.filepath).split("CUT")[-1][:3]
+    if to_replace_with_SCE == "nopatt" or to_replace_with_CUT == "nopatt":
         return
     for scene in bpy.data.scenes:
         if scene.library != None: continue # se la scena è linkata, non fare niente
@@ -86,17 +17,14 @@ def rename_all_paths_with_filename_2():
             existing_base_path = getattr(node, "base_path", None) # prendi il base path del nodo
          #   print(existing_base_path)
             if not existing_base_path: continue # se non c'è il base path, non fare più niente
-            to_be_replaced_SCE = pattern_find_SCE(existing_base_path)
-            to_be_replaced_SCE_CUT = pattern_find_SCE_CUT(existing_base_path)
-            if to_be_replaced_SCE != "nopatt" and to_be_replaced_SCE_CUT != "nopatt":
-                node.base_path = existing_base_path.replace(to_be_replaced_SCE_CUT, to_replace_with)
-                node.base_path = existing_base_path.replace(to_be_replaced_SCE, to_replace_with[:6])
-        ren_to_be_replaced_SCE = pattern_find_SCE(scene.render.filepath)
-        ren_to_be_replaced_SCE_CUT = pattern_find_SCE_CUT(scene.render.filepath)
-        if ren_to_be_replaced_SCE != "nopatt" and ren_to_be_replaced_SCE_CUT != "nopatt":
-            scene.render.filepath = scene.render.filepath.replace(ren_to_be_replaced_SCE_CUT, to_replace_with)
-            scene.render.filepath = scene.render.filepath.replace(ren_to_be_replaced_SCE, to_replace_with[6:])
-
+            to_be_replaced_SCE = "SCE" + existing_base_path.split("SCE")[-1][:3]
+            node.base_path = existing_base_path.replace(to_be_replaced_SCE, to_replace_with_SCE) 
+            to_be_replaced_CUT = "CUT" + existing_base_path.split("CUT")[-1][:3]
+            node.base_path = existing_base_path.replace(to_be_replaced_CUT, to_replace_with_CUT) 
+        ren_to_be_replaced_SCE = "SCE" + scene.render.filepath.split("SCE")[-1][:3]
+        ren_to_be_replaced_CUT = "CUT" + scene.render.filepath.split("CUT")[-1][:3]
+        scene.render.filepath = scene.render.filepath.replace(ren_to_be_replaced_SCE, to_replace_with_SCE)
+        scene.render.filepath = scene.render.filepath.replace(ren_to_be_replaced_CUT, to_replace_with_CUT)
 
 def relocate_library_paths(old_path, new_path):
     old_path = old_path.replace("//", "")
