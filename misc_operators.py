@@ -15,12 +15,14 @@ def rename_all_paths_with_filename_2():
         if scene.library != None: continue # se la scena è linkata, non fare niente
         for node in scene.node_tree.nodes: # per ogni nodo nel compositor node tree della scena:
             existing_base_path = getattr(node, "base_path", None) # prendi il base path del nodo
-         #   print(existing_base_path)
             if not existing_base_path: continue # se non c'è il base path, non fare più niente
-            to_be_replaced_SCE = "SCE" + existing_base_path.split("SCE")[-1][:3]
-            node.base_path = existing_base_path.replace(to_be_replaced_SCE, to_replace_with_SCE) 
-            to_be_replaced_CUT = "CUT" + existing_base_path.split("CUT")[-1][:3]
-            node.base_path = existing_base_path.replace(to_be_replaced_CUT, to_replace_with_CUT) 
+            to_be_replaced_SCE_list = ["SCE" + tbr[:3] for tbr in node.base_path.split("SCE") if tbr[2].isdigit()]
+            to_be_replaced_CUT_list = ["CUT" + tbr[:3] for tbr in node.base_path.split("CUT") if tbr[2].isdigit()]
+            for to_be_replaced_SCE in to_be_replaced_SCE_list:
+                node.base_path = node.base_path.replace(to_be_replaced_SCE, to_replace_with_SCE) 
+            for to_be_replaced_CUT in to_be_replaced_CUT_list:
+                node.base_path = node.base_path.replace(to_be_replaced_CUT, to_replace_with_CUT) 
+            
         ren_to_be_replaced_SCE = "SCE" + scene.render.filepath.split("SCE")[-1][:3]
         ren_to_be_replaced_CUT = "CUT" + scene.render.filepath.split("CUT")[-1][:3]
         scene.render.filepath = scene.render.filepath.replace(ren_to_be_replaced_SCE, to_replace_with_SCE)
